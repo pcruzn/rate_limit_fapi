@@ -7,12 +7,13 @@ from app.routers.users import router as users_router
 app = FastAPI()
 app.include_router(users_router)
 
+#replaces _rate_limit_exceeded_handler
 @app.exception_handler(RateLimitExceeded)
 def rate_limit_exception_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
         status_code=429,
         content={
-            "error": "Too Many Requests",
+            "error": "Too many requests, try again later.",
             "reason": str(exc)
         }
     )
@@ -24,4 +25,6 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_exception_handler)
 @limiter.limit("5/minute")
 def root(request: Request):
     print(request.method)
-    return {"message": "Hello World"}
+    return {
+        "message": "Hello World"
+    }
